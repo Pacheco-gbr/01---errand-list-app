@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  ButtonGroup,
   Grid,
   Paper,
   Table,
@@ -10,12 +9,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { InputDefault, Name } from "../../components/InputDefault";
-import { Message, User } from "../../config/types";
+import { Note, User } from "../../config/types";
 import { v4 as uuid } from "uuid";
 import { Modal } from "../../components/Modal";
 
@@ -45,7 +43,7 @@ function Home() {
 
   useEffect(() => {
     localStorage.setItem("loginEstablished", JSON.stringify(userLogged));
-  }, [userLogged?.messages]);
+  },[userLogged]);
 
   const handleChangeTwo = (value: string, key: Name) => {
     switch (key) {
@@ -68,7 +66,7 @@ function Home() {
 
     if (listUsers !== null) {
       const verifiedIndex = listUsers.findIndex(
-        (user) => user.email == userLogged?.email
+        (user) => user.email === userLogged?.email
       );
       listUsers[verifiedIndex] = userLogged as User;
       localStorage.setItem("listOfUsers", JSON.stringify(listUsers));
@@ -82,8 +80,8 @@ function Home() {
   };
 
   const handleSaveMessage = () => {
-    if (description != "" && detail != "") {
-      const newMessage: Message = {
+    if (description !== "" && detail !== "") {
+      const newMessage: Note = {
         id: uuid(),
         description,
         detail,
@@ -107,10 +105,10 @@ function Home() {
     }
   };
   const handleSaveEdit = (i: number) => {
-    if (description != "" && detail != "") {
+    if (description !== "" && detail !== "") {
       if (userLogged) {
-        const listTemp: Message[] = [...userLogged.messages];
-        const editMessage: Message = {
+        const listTemp: Note[] = [...userLogged.messages];
+        const editMessage: Note = {
           id: userLogged.messages[i].id,
           description,
           detail,

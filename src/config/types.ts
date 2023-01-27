@@ -2,10 +2,10 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  messages: Message[];
+  messages: Note[];
 }
 
-export interface Message {
+export interface Note {
   id: string;
   description: string;
   detail: string;
