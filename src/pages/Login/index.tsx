@@ -15,7 +15,7 @@ function Login() {
 
         if(userLogged){
           navigate('/home')
-          }
+        }
 
           return() => {
             console.log('olá,')
