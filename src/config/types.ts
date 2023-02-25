@@ -2,7 +2,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  messages: Note[];
+  errands: Note[];
 }
 
 export interface Note {

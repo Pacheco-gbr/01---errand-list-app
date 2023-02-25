@@ -89,7 +89,7 @@ function Home() {
       if (userLogged) {
         setUserLogged({
           ...userLogged,
-          messages: [...userLogged?.messages, newMessage],
+          errands: [...userLogged?.errands, newMessage],
         });
         clearInputs();
       }
@@ -98,8 +98,8 @@ function Home() {
 
   const handleEdit = (i: number) => {
     if (userLogged) {
-      setDescription(userLogged.messages[i].description);
-      setDetail(userLogged.messages[i].detail);
+      setDescription(userLogged.errands[i].description);
+      setDetail(userLogged.errands[i].detail);
       setChosenIndex(i);
       setModeEdit(true);
     }
@@ -107,14 +107,14 @@ function Home() {
   const handleSaveEdit = (i: number) => {
     if (description !== "" && detail !== "") {
       if (userLogged) {
-        const listTemp: Note[] = [...userLogged.messages];
+        const listTemp: Note[] = [...userLogged.errands];
         const editMessage: Note = {
-          id: userLogged.messages[i].id,
+          id: userLogged.errands[i].id,
           description,
           detail,
         };
         listTemp[i] = editMessage;
-        setUserLogged({ ...userLogged, messages: listTemp });
+        setUserLogged({ ...userLogged, errands: listTemp });
         setChosenIndex(-1);
         clearInputs();
         setModeEdit(false);
@@ -266,7 +266,7 @@ function Home() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {userLogged?.messages.map((row, index) => (
+                {userLogged?.errands.map((row, index) => (
                   <TableRow
                     key={row.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
