@@ -94,7 +94,7 @@ function Form({ mode }: FormProps) {
       name,
       email,
       password,
-      messages: [],
+      errands: [],
     };
 
     const userExist = listOfUsers.some(

@@ -13,7 +13,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { InputDefault, Name } from "../../components/InputDefault";
-import { Note, User } from "../../config/types";
+import { Errand, User } from "../../config/types";
 import { v4 as uuid } from "uuid";
 import { Modal } from "../../components/Modal";
 
@@ -81,7 +81,7 @@ function Home() {
 
   const handleSaveMessage = () => {
     if (description !== "" && detail !== "") {
-      const newMessage: Note = {
+      const newMessage: Errand = {
         id: uuid(),
         description,
         detail,
@@ -107,8 +107,8 @@ function Home() {
   const handleSaveEdit = (i: number) => {
     if (description !== "" && detail !== "") {
       if (userLogged) {
-        const listTemp: Note[] = [...userLogged.errands];
-        const editMessage: Note = {
+        const listTemp: Errand[] = [...userLogged.errands];
+        const editMessage: Errand = {
           id: userLogged.errands[i].id,
           description,
           detail,

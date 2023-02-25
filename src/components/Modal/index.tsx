@@ -14,10 +14,10 @@ function Modal({ open, handleClose, user, setUser, index }: ModalProps) {
 
   const handleConfirm = () => {
 
-      const temp = [...user?.messages]
+      const temp = [...user?.errands]
 
       temp.splice(index, 1)
-      setUser({...user, messages: temp})
+      setUser({...user, errands: temp})
       handleClose()
   }
   return (
