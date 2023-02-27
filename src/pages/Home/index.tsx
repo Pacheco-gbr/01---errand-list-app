@@ -228,17 +228,13 @@ function Home() {
         </Grid>
       </Grid>
       <Grid container>
-        <Grid item xs={12} sx={{ marginLeft: "500px" }}>
+        <Grid item>
           <Button
             variant="contained"
-            sx={{
-              marginBottom: "10px",
-              backgroundColor: "#373626",
-            }}
             color="error"
             onClick={() => setShowFiledErrands(!showFiledErrands)}
           >
-            {showFiledErrands ? "Unfiled errands" : "Filled errands"}
+            {showFiledErrands ? "Unfiled errands" : "Filed errands"}
           </Button>
         </Grid>
         <Grid xs={12} item>
