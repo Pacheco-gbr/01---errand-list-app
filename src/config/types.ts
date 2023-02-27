@@ -9,4 +9,5 @@ export interface Errand {
   id: string;
   description: string;
   detail: string;
+  filed: boolean;
 }
