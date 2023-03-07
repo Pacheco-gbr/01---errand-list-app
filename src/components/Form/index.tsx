@@ -119,7 +119,7 @@ function Form({ mode }: FormProps) {
 
     if (!userExist) {
       const userConfirming = window.confirm(
-        "This data has not been found in localstorage. Do you want to create another account?"
+        "This data has not been found. Do you want to create another account?"
       );
 
       if (userConfirming) {
