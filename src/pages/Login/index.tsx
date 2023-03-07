@@ -1,37 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BannerImage } from '../../components/BannerImage';
-import { ContainerForm } from '../../components/ContainerForm';
-import { Form } from '../../components/Form';
-import { WrapperContent } from '../../components/WrapperContent';
-import { User } from '../../config/types';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { BannerImage } from "../../components/BannerImage";
+import { ContainerForm } from "../../components/ContainerForm";
+import { Form } from "../../components/Form";
+import { WrapperContent } from "../../components/WrapperContent";
+import { User } from "../../store/modules/typeStore";
 
 function Login() {
   const navigate = useNavigate();
-  const [userLogged, setUserLogged] = useState<User | null>(JSON.parse(localStorage.getItem('loginEstablished') ?? 'null'))
+  const [userLogged, setUserLogged] = useState<User | null>(
+    JSON.parse(localStorage.getItem("loginEstablished") ?? "null")
+  );
 
-    useEffect(
-      () => {
+  useEffect(() => {
+    if (userLogged) {
+      navigate("/home");
+    }
 
-        if(userLogged){
-          navigate('/home')
-        }
+    return () => {
+      console.log("olá,");
+    };
+  }, [navigate, userLogged]);
 
-          return() => {
-            console.log('olá,')
-        }
-      },
-      [navigate, userLogged]
-    )
-
-  return(
+  return (
     <WrapperContent>
-          <BannerImage/>
-          <ContainerForm>
-            <Form mode={'login'}/>
-          </ContainerForm>
+      <BannerImage />
+      <ContainerForm>
+        <Form mode={"login"} />
+      </ContainerForm>
     </WrapperContent>
-  )
+  );
 }
 
-export { Login }
+export { Login };

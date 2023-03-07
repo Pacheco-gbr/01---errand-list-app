@@ -1,25 +1,29 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import React from "react";
-import { User } from "../../config/types";
+import { useAppDispatch } from "../../store/hooks";
+import { deleteErrand } from "../../store/modules/errands/errandsSlice";
+import { User } from "../../store/modules/typeStore";
 
 interface ModalProps {
   open: boolean;
   handleClose: () => void;
-  user: User;
-  setUser: React.Dispatch<React.SetStateAction<User | null >>;
-  index: number;
+  idErrand: string;
+  idUser: string
 }
 
-function Modal({ open, handleClose, user, setUser, index }: ModalProps) {
-
+function Modal({ open, handleClose, idErrand, idUser}: ModalProps) {
+  const dispatch = useAppDispatch()
   const handleConfirm = () => {
-
-      const temp = [...user?.errands]
-
-      temp.splice(index, 1)
-      setUser({...user, errands: temp})
-      handleClose()
-  }
+    dispatch(deleteErrand({idUser, idErrand}))
+    handleClose();
+  };
   return (
     <Dialog
       open={open}
@@ -28,20 +32,24 @@ function Modal({ open, handleClose, user, setUser, index }: ModalProps) {
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title">
-        {`Are you sure that you want to delete the message ${index}?`} 
+        {`Are you sure that you want to delete the message?`}
       </DialogTitle>
-          
+
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           If you confirm, this action won't be undone.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleConfirm} color='success'>Confirm</Button>
-        <Button onClick={handleClose} autoFocus color='error'>Cancel</Button>
+        <Button onClick={handleConfirm} color="success">
+          Confirm
+        </Button>
+        <Button onClick={handleClose} autoFocus color="error">
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   );
 }
 
-export { Modal }
+export { Modal };

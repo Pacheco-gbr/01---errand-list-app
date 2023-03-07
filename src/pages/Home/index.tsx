@@ -10,12 +10,18 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { InputDefault, Name } from "../../components/InputDefault";
-import { Errand, User } from "../../config/types";
-import { v4 as uuid } from "uuid";
 import { Modal } from "../../components/Modal";
+import { User } from "../../store/modules/typeStore";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  attErrand,
+  findingAllErrands,
+  getErrands,
+  saveErrand,
+} from "../../store/modules/errands/errandsSlice";
 
 function Home() {
   const navigate = useNavigate();
@@ -24,21 +30,28 @@ function Home() {
   );
   const [description, setDescription] = useState("");
   const [detail, setDetail] = useState("");
-  const [chosenIndex, setChosenIndex] = useState(-1);
   const [openModal, setOpenModal] = useState(false);
   const [modeEdit, setModeEdit] = useState(false);
-  const [filed, setFiled] = useState(false);
   const [showFiledErrands, setShowFiledErrands] = useState(false);
+  const [idErrand, setIdErrand] = useState("");
+
+  const dispatch = useAppDispatch();
+  const listErrands = useAppSelector(findingAllErrands);
+  
+
+  const clearInputs = () => {
+    setDescription("");
+    setDetail("");
+    setIdErrand("");
+  };
+
+  const getIdFromLocalstorage = () => {
+    return JSON.parse(localStorage.getItem("loginEstablished") || "");
+  };
 
   useEffect(() => {
-    if (!userLogged) {
-      navigate("/");
-    }
-  }, [navigate, userLogged]);
-
-  useEffect(() => {
-    localStorage.setItem("loginEstablished", JSON.stringify(userLogged));
-  }, [userLogged]);
+    dispatch(getErrands(getIdFromLocalstorage()));
+  }, [dispatch]);
 
   const handleChangeTwo = (value: string, key: Name) => {
     switch (key) {
@@ -67,7 +80,6 @@ function Home() {
       localStorage.setItem("listOfUsers", JSON.stringify(listUsers));
 
       localStorage.removeItem("loginEstablished");
-
       setTimeout(() => {
         navigate("/");
       }, 500);
@@ -76,68 +88,50 @@ function Home() {
 
   const handleSaveMessage = () => {
     if (description !== "" && detail !== "") {
-      const newMessage: Errand = {
-        id: uuid(),
-        description,
-        detail,
-        filed,
-      };
-      if (userLogged) {
-        setUserLogged({
-          ...userLogged,
-          errands: [...userLogged?.errands, newMessage],
-        });
-        clearInputs();
-      }
+      dispatch(
+        saveErrand({
+          idUser: getIdFromLocalstorage(),
+          dataCreateErrand: { description, detail },
+        })
+      );
+      clearInputs();
     }
   };
 
-  const handleFile = (index: number) => {
-    if (userLogged) {
-      console.log(index);
-      userLogged.errands[index].filed = !userLogged.errands[index].filed;
-
-      const listTemp = userLogged.errands;
-
-      setUserLogged({ ...userLogged, errands: listTemp });
-    }
+  const handleFile= (idErrand: string, filed: boolean) => {
+    dispatch(attErrand({
+      idUser: getIdFromLocalstorage(),
+      idErrand: idErrand,
+      dataUpdateErrand: { filed: !filed }
+    }))
   };
-
-  const handleEdit = (i: number) => {
-    if (userLogged) {
-      setDescription(userLogged.errands[i].description);
-      setDetail(userLogged.errands[i].detail);
-      setFiled(userLogged.errands[i].filed);
-      setChosenIndex(i);
-      setModeEdit(true);
-    }
-  };
-  const handleSaveEdit = (i: number) => {
+  
+  const handleSaveEdit = (idErrand: string) => {
+    console.log(idErrand);
     if (description !== "" && detail !== "") {
-      if (userLogged) {
-        const listTemp: Errand[] = [...userLogged.errands];
-        const editMessage: Errand = {
-          id: userLogged.errands[i].id,
-          description,
-          detail,
-          filed,
-        };
-        listTemp[i] = editMessage;
-        setUserLogged({ ...userLogged, errands: listTemp });
-        setChosenIndex(-1);
-        clearInputs();
-        setModeEdit(false);
-      }
+      console.log(idErrand);
+      dispatch(
+        attErrand({
+          idUser: getIdFromLocalstorage(),
+          idErrand: idErrand,
+          dataUpdateErrand: { description, detail },
+        })
+      );
+      clearInputs();
     }
   };
-  const handleDelete = (i: number) => {
-    setChosenIndex(i);
-    setOpenModal(true);
+
+  const handleEdit = (id: string) => {
+    setModeEdit(true);
+    const indexOfErrand = listErrands.findIndex((errand) => errand.id === id);
+    setDescription(listErrands[indexOfErrand].description);
+    setDetail(listErrands[indexOfErrand].detail);
+    setIdErrand(id);
   };
 
-  const clearInputs = () => {
-    setDescription("");
-    setDetail("");
+  const handleDelete = (id: string) => {
+    setIdErrand(id);
+    setOpenModal(true);
   };
 
   const handleCloseModal = () => {
@@ -217,7 +211,7 @@ function Home() {
             color="success"
             onClick={() => {
               if (modeEdit !== false) {
-                handleSaveEdit(chosenIndex);
+                handleSaveEdit(idErrand);
               } else {
                 handleSaveMessage();
               }
@@ -284,7 +278,7 @@ function Home() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {userLogged?.errands.map((row, index) => {
+                {listErrands?.map((row, index) => {
                   if (row.filed === showFiledErrands) {
                     return (
                       <TableRow
@@ -310,7 +304,7 @@ function Home() {
                               backgroundColor: "#373626",
                             }}
                             color="warning"
-                            onClick={() => handleFile(index)}
+                            onClick={() => handleFile(row.id, row.filed)}
                           >
                             File
                           </Button>
@@ -321,7 +315,7 @@ function Home() {
                               backgroundColor: "#373626",
                             }}
                             color="warning"
-                            onClick={() => handleEdit(index)}
+                            onClick={() => handleEdit(row.id)}
                           >
                             Edit
                           </Button>
@@ -332,7 +326,7 @@ function Home() {
                               backgroundColor: "#373626",
                             }}
                             color="error"
-                            onClick={() => handleDelete(index)}
+                            onClick={() => handleDelete(row.id)}
                           >
                             Delete
                           </Button>
@@ -340,6 +334,7 @@ function Home() {
                       </TableRow>
                     );
                   }
+                  return true;
                 })}
               </TableBody>
             </Table>
@@ -347,11 +342,10 @@ function Home() {
         </Grid>
       </Grid>
       <Modal
-        index={chosenIndex}
+        idErrand={idErrand}
+        idUser={getIdFromLocalstorage()}
         open={openModal}
         handleClose={handleCloseModal}
-        user={userLogged as User}
-        setUser={setUserLogged}
       />
     </Box>
   );

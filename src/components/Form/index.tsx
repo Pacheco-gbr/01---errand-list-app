@@ -1,8 +1,9 @@
 import { Stack, Box, Button, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { InputDefault, Name } from "../InputDefault";
 import { useNavigate } from "react-router-dom";
-import { User } from "../../config/types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { findingAllUsers, getUsers, postUser } from "../../store/modules/users/usersSlice";
 
 interface FormProps {
   mode: "login" | "signup";
@@ -16,9 +17,14 @@ function Form({ mode }: FormProps) {
   const [errorName, setErrorName] = useState(false);
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPassword, setErrorPassword] = useState(false);
-  const [listOfUsers, setListOfUsers] = useState<User[]>(JSON.parse(localStorage.getItem("listOfUsers") ?? "[]"));
+  const usersRedux = useAppSelector(findingAllUsers);
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(getUsers())
+  }, [dispatch])
 
   useEffect(() => {
     if (name.length < 3) {
@@ -54,10 +60,6 @@ function Form({ mode }: FormProps) {
       }
     }
   }, [name, email, password, repassword, mode]);
-
-  useEffect(() => {
-    localStorage.setItem("listOfUsers", JSON.stringify(listOfUsers));
-  }, [listOfUsers]);
 
   const changingInput = (value: string, key: Name) => {
     switch (key) {
@@ -97,12 +99,10 @@ function Form({ mode }: FormProps) {
       errands: [],
     };
 
-    const userExist = listOfUsers.some(
-      (user) => user.email === newUser.email
-    );
+    const userExist = usersRedux.some((user) => user.email === newUser.email);
 
     if (!userExist) {
-      setListOfUsers([...listOfUsers, newUser]);
+      dispatch(postUser(newUser))
       clearInputs();
       alert("User settled!");
 
@@ -115,9 +115,7 @@ function Form({ mode }: FormProps) {
   };
 
   const login = () => {
-    const userExist = listOfUsers.find(
-      (user) => user.email === email && user.password === password
-    );
+    const userExist = usersRedux.find((user) => user.email === email && user.password === password);
 
     if (!userExist) {
       const userConfirming = window.confirm(
@@ -128,7 +126,7 @@ function Form({ mode }: FormProps) {
         navigate("/signup");
       }
     } else {
-      localStorage.setItem("loginEstablished", JSON.stringify(userExist));
+      localStorage.setItem("loginEstablished", JSON.stringify(userExist.id));
 
       alert("Successful login! You will be in your Home in seconds...");
       setTimeout(() => {
@@ -147,7 +145,7 @@ function Form({ mode }: FormProps) {
   return (
     <>
       <Stack spacing={2}>
-        {mode == "signup" && (
+        {mode === "signup" && (
           <>
             <InputDefault
               typeToSend="text"
@@ -219,11 +217,13 @@ function Form({ mode }: FormProps) {
 
       <Box>
         {mode === "login" && (
-          <Typography>Do not have an account? <Typography
+          <Typography>
+            Do not have an account?{" "}
+            <Typography
               variant="caption"
               color="darkblue"
               onClick={changingPage}
-              sx = {{cursor: 'pointer', marginLeft: '0.01rem'}}
+              sx={{ cursor: "pointer", marginLeft: "0.01rem" }}
             >
               Register
             </Typography>
@@ -236,7 +236,7 @@ function Form({ mode }: FormProps) {
               variant="caption"
               color="darkblue"
               onClick={changingPage}
-              sx = {{cursor: 'pointer', marginLeft: '0.25rem'}}
+              sx={{ cursor: "pointer", marginLeft: "0.25rem" }}
             >
               Click here to go back.
             </Typography>
